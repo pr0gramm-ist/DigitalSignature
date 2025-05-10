@@ -1,0 +1,18 @@
+#modulo = random_prime(2^256-1,False,2^254)
+modulo = 30699232851861250083325455112151246498963906158005131330497024639069102717541
+flag = false
+a = 21
+
+while not flag:
+    for b in range(90, modulo - 1):
+        ellipticCurve = EllipticCurve(GF(modulo), [0, 0, 0, a, b])
+        order = ellipticCurve.order()
+        print(order)
+        if order in Primes():
+            print(ellipticCurve)
+            flag = true
+            break;
+    
+30699232851861250083325455112151246498735326763794631201959198858455814623090
+30699232851861250083325455112151246499071742240808174527800635103565365721103
+Elliptic Curve defined by y^2 = x^3 + 21*x + 91 over Finite Field of size 30699232851861250083325455112151246498963906158005131330497024639069102717541
