@@ -143,6 +143,10 @@ namespace DigitalSignature
             return result;
         }
 
+        public static VeryBigInteger GenerateKey(EdwardsCurvePoint P)
+        {
+            return VeryBigInteger.NextRandomNumber() % P.Order;
+        }
         private static VeryBigInteger bitsToNumber(BitArray bits)
         {
             var binaryPow = VeryBigInteger.One();

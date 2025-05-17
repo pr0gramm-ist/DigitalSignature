@@ -174,7 +174,7 @@ namespace DigitalSignatureForms
                 return;
             }
 
-            key = VeryBigInteger.NextRandomNumber() % edwardsCurvePoint.Order;
+            key = GOST3410_2018.GenerateKey(edwardsCurvePoint);
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "key files (*.key)|*.key";
