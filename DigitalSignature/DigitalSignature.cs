@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
+﻿using System.Threading.Tasks;
 using DigitalSignature.Curves;
 using System.Collections;
 
@@ -14,6 +9,7 @@ namespace DigitalSignature
         public static bool ItsGoodCurve(EdwardsCurve edwardsCurve)
         {
             if (!edwardsCurve.p.IsPrime()) return false;
+            if (edwardsCurve.countOfPoints == null) return false;
             if (edwardsCurve.countOfPoints == edwardsCurve.p) return false;
             var q = edwardsCurve.countOfPoints / 4;
             if (q.IsPrime() == false) return false;
@@ -22,6 +18,7 @@ namespace DigitalSignature
             var number2_256 = new VeryBigInteger(256, true);
             var number2_508 = new VeryBigInteger(508, true);
             var number2_512 = new VeryBigInteger(512, true);
+
             var B = 1;
             if(q > number2_254 && q < number2_256)
             {
@@ -147,6 +144,7 @@ namespace DigitalSignature
         {
             return VeryBigInteger.NextRandomNumber() % P.Order;
         }
+
         private static VeryBigInteger bitsToNumber(BitArray bits)
         {
             var binaryPow = VeryBigInteger.One();

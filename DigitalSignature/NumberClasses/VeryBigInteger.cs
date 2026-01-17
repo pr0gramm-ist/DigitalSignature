@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitalSignature
@@ -57,7 +55,7 @@ namespace DigitalSignature
                     case '7':
                     case '8':
                     case '9':
-                        value += pow * (int)hexString[i];
+                        value += pow * int.Parse(hexString[i].ToString());
                         break;
                     case 'a':
                     case 'A':
@@ -247,6 +245,27 @@ namespace DigitalSignature
             return state;
         }
 
+        public static VeryBigInteger NextRandomNumber(VeryBigInteger startNumber, VeryBigInteger endNumber)
+        {
+            var state = VeryBigInteger.NextRandomNumber();
+            if(state >= startNumber && state <= endNumber)
+            {
+                return state;
+            }
+
+            while(state < startNumber || state > endNumber)
+            {
+                var state1 = VeryBigInteger.NextRandomNumber();
+                state = state * state1 % endNumber;
+                if(state == 0)
+                {
+                    state = VeryBigInteger.One();
+                }
+            }
+
+            return state;
+        }
+
         //firstNumber * u + secondNumber * v = GCD(firstNumber, secondNumber)
         public static VeryBigInteger GCD(VeryBigInteger firstNumber, VeryBigInteger secondNumber, out VeryBigInteger u, out VeryBigInteger v)
         {
@@ -293,6 +312,10 @@ namespace DigitalSignature
             var strongBases = PrimeNumbers.Numbers;
             foreach(var primeBase in strongBases)
             {
+                if (primeBase >= this)
+                {
+                    return true;
+                }
                 if (this % primeBase == 0) return false;
             }
 

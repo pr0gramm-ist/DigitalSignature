@@ -19,3 +19,10 @@ C:\Users\pr0gr\Documents\Курсовая\5 курс\Цифровая подпи
 C:\Users\pr0gr\Documents\Курсовая\5 курс\Цифровая подпись\DigitalSignature\obj\Debug\DigitalSignature.csproj.CoreCompileInputs.cache
 C:\Users\pr0gr\Documents\Курсовая\5 курс\Цифровая подпись\DigitalSignature\obj\Debug\DigitalSignature.exe
 C:\Users\pr0gr\Documents\Курсовая\5 курс\Цифровая подпись\DigitalSignature\obj\Debug\DigitalSignature.pdb
+C:\Users\pr0gr\Documents\Курсовая\Диплом\Цифровая подпись\DigitalSignature\bin\Debug\DigitalSignature.exe.config
+C:\Users\pr0gr\Documents\Курсовая\Диплом\Цифровая подпись\DigitalSignature\bin\Debug\DigitalSignature.exe
+C:\Users\pr0gr\Documents\Курсовая\Диплом\Цифровая подпись\DigitalSignature\bin\Debug\DigitalSignature.pdb
+C:\Users\pr0gr\Documents\Курсовая\Диплом\Цифровая подпись\DigitalSignature\obj\Debug\DigitalSignature.csproj.AssemblyReference.cache
+C:\Users\pr0gr\Documents\Курсовая\Диплом\Цифровая подпись\DigitalSignature\obj\Debug\DigitalSignature.csproj.CoreCompileInputs.cache
+C:\Users\pr0gr\Documents\Курсовая\Диплом\Цифровая подпись\DigitalSignature\obj\Debug\DigitalSignature.exe
+C:\Users\pr0gr\Documents\Курсовая\Диплом\Цифровая подпись\DigitalSignature\obj\Debug\DigitalSignature.pdb

@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using DigitalSignature.Curves;
 using DigitalSignature;
 using Microsoft.Win32;
@@ -315,6 +305,81 @@ namespace DigitalSignatureForms
                 }
 
                 signFile.Text = filename;
+
+                loading.Visibility = Visibility.Hidden;
+
+            }
+        }
+
+        private async void generateCurve_Click(object sender, RoutedEventArgs e)
+        {
+
+            loading.Visibility = Visibility.Visible;
+            edwardsCurve = await EdwardsCurve.GenerateCurveAsync();
+            loading.Visibility = Visibility.Hidden;
+        }
+
+        private void saveCurve_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "curve files (*.edw)|*.edw";
+            var answer = saveFileDialog.ShowDialog();
+            if (answer == true)
+            {
+                string filename = saveFileDialog.FileName;
+                using (var sw = new StreamWriter(filename))
+                {
+                    sw.WriteLine($"{edwardsCurve.e.Value} {edwardsCurve.d.Value} {edwardsCurve.p}");
+                }
+            }
+        }
+
+        private void loadCurve_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                loading.Visibility = Visibility.Visible;
+                string filename = openFileDialog.FileName;
+                using (var sr = new StreamReader(filename))
+                {
+                    var curveNumbers = sr.ReadLine().Split(' ');
+                    var curve = new EdwardsCurve(new VeryBigInteger(curveNumbers[0]), new VeryBigInteger(curveNumbers[1]), new VeryBigInteger(curveNumbers[2]));
+                    var selectedIndex = 0;
+
+                    if (curve == EdwardsCurve.id_tc26_gost_3410_2012_256_paramSetA())
+                    {
+                        edwardsCurve = EdwardsCurve.id_tc26_gost_3410_2012_256_paramSetA();
+                        selectedIndex = 0;
+                    }
+                    else if (curve == EdwardsCurve.id_tc26_gost_3410_2012_512_paramSetC())
+                    {
+                        edwardsCurve = EdwardsCurve.id_tc26_gost_3410_2012_512_paramSetC();
+                        selectedIndex = 1;
+                    }
+                    else
+                    {
+                        edwardsCurve = curve;
+                        
+                        if (!GOST3410_2018.ItsGoodCurve(edwardsCurve))
+                        {
+                            MessageBox.Show("Вы пытаетесь загрузить ненадежную кривую! Загрузка отменена");
+                            edwardsCurve = null;
+                            selectedIndex = -1;
+                        }
+                        else
+                        {
+                            while(curveSelection.Items.Count > 2)
+                            {
+                                curveSelection.Items.Remove(curveSelection.Items[curveSelection.Items.Count - 1]);
+                            }
+                            curveSelection.Items.Add(edwardsCurve);
+                            selectedIndex = 2;
+                        }
+                        
+                    }
+                    curveSelection.SelectedIndex = selectedIndex;
+                }
 
                 loading.Visibility = Visibility.Hidden;
 

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DigitalSignatureForms"
         xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" x:Class="DigitalSignatureForms.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" MinWidth="6" WindowState="Maximized" Height="626.4">
+        Title="MainWindow" MinWidth="6" WindowState="Maximized" Height="721" Width="779.2">
     <Window.Resources>
         <Style x:Key="FocusVisual">
             <Setter Property="Control.Template">
@@ -325,6 +325,9 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </Grid>
+                <Button x:Name="generateCurve" Content="Сгенерировать кривую" Background="#FF32B5E9" Foreground="White" BorderBrush="{x:Null}" Margin="5,0,0.4,0" Padding="1,5" FontFamily="Dubai Medium" FontSize="14" Height="35" Click="generateCurve_Click"/>
+                <Button x:Name="saveCurve" Content="Сохранить кривую" Background="#FF32B5E9" Foreground="White" BorderBrush="{x:Null}" Margin="5,10,0.4,0" Padding="1,5" FontFamily="Dubai Medium" FontSize="14" Height="35" Click="saveCurve_Click"/>
+                <Button x:Name="loadCurve" Content="Загрузить кривую" Background="#FF32B5E9" Foreground="White" BorderBrush="{x:Null}" Margin="5,10,0.4,0" Padding="1,5" FontFamily="Dubai Medium" FontSize="14" Height="35" Click="loadCurve_Click"/>
                 <Grid Margin="0,5,0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="70"/>

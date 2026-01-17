@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DigitalSignature.Curves
@@ -20,29 +19,48 @@ namespace DigitalSignature.Curves
         private static EdwardsCurve Id_tc26_gost_3410_2012_256_paramSetA = null;
         private static EdwardsCurve Id_tc26_gost_3410_2012_512_paramSetC = null;
 
-        public EdwardsCurve(VeryBigInteger e, VeryBigInteger d, VeryBigInteger p, VeryBigInteger countOfPoints = null)
+        public EdwardsCurve(VeryBigInteger e, VeryBigInteger d, VeryBigInteger p)
         {
             this.p = p;
             this.e = new FmodElement(e, p);
             this.d = new FmodElement(d, p);
-            if(!(countOfPoints is null))
-            {
-                this.countOfPoints = countOfPoints;
-            }
+
+            SetCountOfPoints();
         }
 
-        private EdwardsCurve(VeryBigInteger e, VeryBigInteger d, VeryBigInteger p, VeryBigInteger countOfPoints = null, bool isGoodCurve = false)
+        private EdwardsCurve(VeryBigInteger e, VeryBigInteger d, VeryBigInteger p, VeryBigInteger countOfPoints, bool isGoodCurve)
         {
             this.p = p;
             this.e = new FmodElement(e, p);
             this.d = new FmodElement(d, p);
-            if (!(countOfPoints is null))
-            {
-                this.countOfPoints = countOfPoints;
-            }
+            this.countOfPoints = countOfPoints;
             this.isGoodCurve = isGoodCurve;
         }
 
+        private void SetCountOfPoints()
+        {
+            countOfPoints = VeryBigInteger.Zero();
+            var two = new FmodElement(2, p);
+            if (this == EdwardsCurve.id_tc26_gost_3410_2012_256_paramSetA())
+            {
+                countOfPoints = EdwardsCurve.id_tc26_gost_3410_2012_256_paramSetA().countOfPoints;
+            }
+            else if (this == EdwardsCurve.id_tc26_gost_3410_2012_512_paramSetC())
+            {
+                countOfPoints = EdwardsCurve.id_tc26_gost_3410_2012_512_paramSetC().countOfPoints;
+            }
+            else if (p % 4 == 3 && e == 1 && (d == 2 || d == two.Reverse()))
+            {
+                if (d.LegendreSymbol() == 1)
+                {
+                    countOfPoints = p - 3;
+                }
+                else
+                {
+                    countOfPoints = p + 1;
+                }
+            }
+        }
         #region КривыеИзГОСТ
         public static EdwardsCurve id_tc26_gost_3410_2012_256_paramSetA()
         {
@@ -84,6 +102,91 @@ namespace DigitalSignature.Curves
             return curve;
         }
         #endregion
+        
+        public static async Task<EdwardsCurve> GenerateCurveAsync()
+        {
+            var result = await Task.Run(() => GenerateCurve());
+            return result;
+        }
+        public static EdwardsCurve GenerateCurve()
+        {
+            var generatedCurve = new EdwardsCurve(VeryBigInteger.One(), VeryBigInteger.One(), new VeryBigInteger(4));
+
+            while (!GOST3410_2018.ItsGoodCurve(generatedCurve))
+            {
+                var p = new VeryBigInteger(4);
+                var s = new VeryBigInteger(5); // стартовое простое число
+                var r = new VeryBigInteger(0);
+                
+                Random random = new Random(DateTime.Now.Millisecond);
+                int randomNumber = random.Next(0, 10);
+
+                var maxDegree = 256;
+
+                var maxP = new VeryBigInteger(maxDegree, true);
+                var minP = new VeryBigInteger(maxDegree - 2, true);
+
+                var k = VeryBigInteger.NextRandomNumber(minP / 4, maxP / 4 - 3);
+
+                p = 4 * k + 3;
+                var countOfPoints1IsGood = false;
+                var countOfPoints2IsGood = false;
+
+                while (!p.IsPrime())
+                {
+                    k++;
+                    p = 4 * k + 3;
+                }
+
+                while (!countOfPoints1IsGood && !countOfPoints2IsGood)
+                {
+                    while (!p.IsPrime())
+                    {
+                        p += 4;
+                    }
+
+                    var countOfPoints1 = (p + 1) / 4;
+                    var countOfPoints2 = (p - 3) / 4;
+
+                    if (countOfPoints1.IsPrime())
+                    {
+                        countOfPoints1IsGood = true;
+                    }
+                    if (countOfPoints2.IsPrime())
+                    {
+                        countOfPoints2IsGood = true;
+                    }
+                }
+
+                var d = new FmodElement(0, p);
+                var legendreOf2 = new FmodElement(2, p);
+                var legendreOfReverse2 = new FmodElement(p - 2, p);
+                var countOfPoints = new VeryBigInteger(0);
+                if (legendreOf2.LegendreSymbol() == -1 && countOfPoints1IsGood)
+                {
+                    countOfPoints = p + 1;
+                    d = new FmodElement(2, p);
+                }
+                else if (legendreOf2.LegendreSymbol() == 1 && countOfPoints2IsGood)
+                {
+                    countOfPoints = p - 3;
+                    d = new FmodElement(2, p);
+                }
+                else if (legendreOfReverse2.LegendreSymbol() == -1 && countOfPoints1IsGood)
+                {
+                    countOfPoints = p + 1;
+                    d = new FmodElement(p - 2, p);
+                }
+                else if (legendreOfReverse2.LegendreSymbol() == 1 && countOfPoints2IsGood)
+                {
+                    countOfPoints = p - 3;
+                    d = new FmodElement(p - 2, p);
+                }
+
+                generatedCurve = new EdwardsCurve(VeryBigInteger.One(), d.Value, p);
+            }
+            return generatedCurve;
+        }
 
         public EdwardsCurvePoint GeneratePoint()
         {
@@ -266,7 +369,9 @@ namespace DigitalSignature.Curves
                 return temp * (k >> 1);
             }
             else
+            {
                 return x + x * (k - 1);
+            }
         }
         public static EdwardsCurvePoint operator *(VeryBigInteger k, EdwardsCurvePoint x)
         {
@@ -281,7 +386,6 @@ namespace DigitalSignature.Curves
             return x * k;
         }
 
-
         public static bool operator ==(EdwardsCurvePoint firstValue, EdwardsCurvePoint secondValue)
         {
             if (firstValue.x == secondValue.x && firstValue.y == secondValue.y && firstValue.edwardsCurve == secondValue.edwardsCurve)
@@ -292,7 +396,6 @@ namespace DigitalSignature.Curves
             {
                 return false;
             }
-
         }
 
         public static bool operator !=(EdwardsCurvePoint firstValue, EdwardsCurvePoint secondValue)
@@ -307,8 +410,6 @@ namespace DigitalSignature.Curves
             }
 
         }
-
-
 
         public override string ToString()
         {
